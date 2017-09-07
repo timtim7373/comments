@@ -1,0 +1,18 @@
+{
+  "name": "author",
+  "description": "test work",
+  "main": "index.js",
+  "authors": [
+    "Tymofii <timsc7@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/timtim7373/author_time-isMoney",
+  "private": true,
+  "dependencies": {
+    "ng-onload": "^0.7.0",
+    "ng-file-upload": "^12.2.13"
+  },
+  "devDependencies": {
+    "ng-file-upload": "^12.2.13"
+  }
+}

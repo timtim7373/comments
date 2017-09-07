@@ -1,0 +1,30 @@
+<div class="comments">
+    <div ng-transclude></div>
+    <label>Sort by:
+        <select ng-change="sortBy.sort()" ng-model="sortBy.method">
+            <option value="date">date</option>
+            <option value="name">name</option>
+            <option value="email">email</option>
+        </select>
+    </label>
+    <label>Sorting direction:
+        <select ng-change="sortBy.sort()" ng-model="sortBy.direction">
+            <option value="ascending">ascending</option>
+            <option value="descending">descending</option>
+        </select>
+    </label>
+    <div>
+        <table>
+            <tbody ng-class=" 'c' + comment.id " ng-repeat="comment in dataForView">
+                <tr><td>{{comment.name}}</td><td>{{comment.date}}</td></tr>
+                <tr><td>{{comment.text}}</td></tr>
+                <tr><td>{{comment.email}}</td></tr>
+                <tr><td><a href="" ng-click="childComment(comment.id, comment.nesting)">Comment</a></td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pages-buttons">
+        <a href="#" ng-repeat="page in pages.pages" ng-click="pages.currentPage = page; pages.pageCreator()">{{ page }}</a>
+    </div>
+    <p>{{ pages.currentPage }}</p>
+</div>

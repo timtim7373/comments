@@ -1,0 +1,50 @@
+body, html {
+  width: 100%;
+  max-width: 1440px;
+  overflow-x: hidden;
+  margin: 0 auto;
+}
+h1 {
+  font: 400 40px/1 'Open Sans', sans-serif;
+  color: #000;
+  position: relative;
+  left: 180px;
+}
+h2 {
+  font: 400 43px/1 'Lobster', cursive;
+  color: #44c0c2;
+}
+h3 {
+  font: 400 23px/37px 'Open Sans', sans-serif;
+  color: #fff;
+}
+h4 {
+  font: 400 42px/1 'Open Sans', sans-serif;
+  color: #4e525d;
+  padding: 70px 0 90px;
+}
+h6 {
+  font: 400 22px/1 'Open Sans', sans-serif;
+  color: #4e525d;
+  margin-bottom: 0;
+}
+p {
+  font: 400 14px/26px 'Open Sans', sans-serif;
+  color: #4e525d;
+}
+ul {
+  padding-left: 0;
+}
+li {
+  list-style: none;
+}
+.content-wrapper {
+  max-width: 1170px;
+  margin: 0 auto;
+}
+button {
+  cursor: pointer;
+}
+#captcha tbody {
+  display: table-row-group;
+}

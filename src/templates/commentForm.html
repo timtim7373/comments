@@ -1,0 +1,14 @@
+<form name="commentsForm">
+    <label>Name<input type="text" placeholder="Name" ng-model="comment.name" pattern="[^А-Яа-яЁё]+" required /></label>
+    <label>E-mail<input type="email" placeholder="Your email" ng-model="comment.email" required /></label>
+    <label>Homepage<input type="text" ng-model="comment.url" placeholder="Url"></label>
+    <textarea name="" id="" cols="50" rows="10" ng-model="comment.text" pattern="[^<>]+" required placeholder="Text"></textarea>
+    <p>* Attention! HTML tags are not allowed in comments</p>
+    <!--<input type="file" class="add-file" name="myfile" multiple>-->
+    <button ngf-select="uploadFiles($files)" multiple
+            accept="image/jpeg, image/png, image/gif, text/plain">Select Files</button>
+    <p class="warning" ng-bind="warning"> </p>
+    <!--<div id="captcha" class="row"></div>-->
+    <div ng-transclude></div>
+    <input type="submit" value="Send" ng-click="saveComment(comment, commentsForm)" />
+</form>
