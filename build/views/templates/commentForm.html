@@ -4,10 +4,13 @@
     <label>Homepage<input type="text" ng-model="comment.url" placeholder="Url"></label>
     <textarea name="" id="" cols="50" rows="10" ng-model="comment.text" pattern="[^<>]+" required placeholder="Text"></textarea>
     <p>* Attention! HTML tags are not allowed in comments</p>
-    <!--<input type="file" class="add-file" name="myfile" multiple>-->
     <button ngf-select="uploadFiles($files)" multiple
             accept="image/jpeg, image/png, image/gif, text/plain">Select Files</button>
-    <p class="warning" ng-bind="warning"> </p>
+    <p class="warning2" ng-bind="warning2"></p>
+    <p class="warning">* Image must be no more than 320х240 or 240x320 pixels</p>
+    <div class="preview-container">
+        <img class="preview" ng-repeat="file in files" ngf-thumbnail="file" ngf-size="{width: 130, height: 130, quality: 0.9}">
+    </div>
     <!--<div id="captcha" class="row"></div>-->
     <div ng-transclude></div>
     <input type="submit" value="Send" ng-click="saveComment(comment, commentsForm)" />

@@ -1,5 +1,5 @@
 .input-form {
-  max-width: 500px;
+  max-width: 550px;
   position: relative;
   left: 80px;
   text-align: left;
@@ -13,8 +13,21 @@
     margin-left: 80px;
   }
   .warning {
-    color: #ff0003;
+    color: #000000;
     font-size: 11px;
+  }
+  .warning2 {
+    padding-left: 20px;
+    margin-bottom: 0;
+    display: inline-block;
+    color: #ff0a00;
+    font-size: 11px;
+  }
+  .preview-container {
+    padding-left: 70px;
+    .preview {
+      padding: 10px;
+    }
   }
   form > input:last-child {
     margin-bottom: 50px;

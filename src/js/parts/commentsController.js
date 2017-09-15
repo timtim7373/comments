@@ -9,61 +9,80 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
         text: "my test work !!!",
 		date: "",
         parentCommentId: 0,
-        nesting: 0,
-        files: 3
+        nesting: 0
     };
-    $scope.warning = "";
+
+    $scope.files = [];
 
     // Upload files
     $scope.uploadFiles = function (files) {
 
-        var width, height, options;
+        $scope.warning2 = "";
+        $scope.files = [];
 
+        var width, height;
 
+        for (var i=0; i<files.length; i++) {
 
-        if (files.length > 0)
-            Upload.imageDimensions(files[0]).then(function(dimensions){
-                dimensions.width = 320;
-                dimensions.height = 240;
-                width = dimensions.width;
-                height = dimensions.height;
-            });
-        Upload.resize(files[0], options).then(function(resizedFile){
-
-        });
-
-        $scope.comment.files = files;
-
-        // console.log(files);
-        // console.log(files[0]);
-
-        if (files.length > 0 && (files[0].type === "image/jpeg" || files[0].type === "image/png" || files[0].type === "image/gif")) {
-            $timeout(function () {
-                if (width > 320 || height > 240)
-                    $scope.warning = "image must be no more than 320х240 pixels";
-                else uploadFunc();
-            }, 500);
-        }
-        function uploadFunc () {
-            $scope.warning = "";
-            Upload.upload({
-                url: '/api/upload',
-                // data: data,
-                file: files
-            }).then(function (response) {
-                $timeout(function () {
-                    // $scope.result = response.data;
-                    console.log(response);
-                    // console.log(response.data);
+            if (files.length > 0 && (files[i].type === "image/jpeg" ||
+                files[i].type === "image/png" ||
+                files[i].type === "image/gif")) {
+                console.log("Ok_1");
+                Upload.imageDimensions(files[i]).then(function (dimensions) {
+                    width = dimensions.width;
+                    height = dimensions.height;
                 });
-            }, function (response) {
-                if (response.status > 0) {
-                    $scope.errorMsg = response.status + ': ' + response.data;
+                res(i);
+
+                function res (i) {
+                    $timeout(function () {
+                        console.log("Ok_1.1");
+                        if (width > 320 || height > 240) {
+                            console.log("Ok_2");
+                            var newWidth, newHeight, options;
+                            if (width > height) {
+                                console.log("Ok_3");
+                                newWidth = 320;
+                                newHeight = height / 100 * (32000 / width);
+                                if (newHeight > 240) {
+                                    newWidth = newWidth / 100 * (24000 / newHeight);
+                                    newHeight = 240;
+                                }
+                                options = {
+                                    width: newWidth,
+                                    height: newHeight
+                                };
+                                Upload.resize(files[i], options).then(function(resizedFile){
+                                    $scope.files.push(resizedFile);
+                                });
+                            }
+                            else if (width < height) {
+                                console.log("Ok_4");
+                                newHeight = 320;
+                                newWidth = width / 100 * (32000 / height);
+                                if (newWidth > 240) {
+                                    newHeight = newHeight / 100 * (24000 / newWidth);
+                                    newWidth = 240;
+                                }
+                                options = {
+                                    width: newWidth,
+                                    height: newHeight
+                                };
+                                Upload.resize(files[i], options).then(function(resizedFile){
+                                    $scope.files.push(resizedFile);
+                                });
+                            }
+                        }
+                        else if (width < 320 && height < 240) {
+                            console.log("Ok_5");
+                            $scope.files.push(files[i]);
+                        }
+                    }, 500);
                 }
-            }, function (evt) {
-                $scope.progress =
-                    Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-            });
+            }
+            else if (files.length > 0 && (files[i].type === "text/plain") && files[i].size < 102400) $scope.files.push(files[i]);
+            else if (files.length > 0 && (files[i].type === "text/plain") && files[i].size > 102400) $scope.warning2 = "The text file must be no more than 100 kbytes";
+            console.log($scope.files);
         }
     };
 
@@ -74,6 +93,25 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
 			$scope.comment.date = new Date();
             $http.post("/", comment).then(function success (response) {
                 console.log(response.data);
+            });
+
+            $scope.warning2 = "";
+            Upload.upload({
+                url: '/api/upload',
+                file: $scope.files
+            }).then(function (response) {
+                $timeout(function () {
+
+                    console.log(response);
+
+                });
+            }, function (response) {
+                if (response.status > 0) {
+                    $scope.errorMsg = response.status + ': ' + response.data;
+                }
+            }, function (evt) {
+                $scope.progress =
+                    Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
             });
         }
     };

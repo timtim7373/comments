@@ -41,8 +41,8 @@ app.get("/comments", function(request, response){
 app.post("/", jsonParser, function (request, response) {
     if(!request.body) return response.sendStatus(400);
 
-    console.log(request.body.files);
-    console.log(request.body);
+    // console.log(request.body.files);
+    // console.log(request.body);
 
     var connection = mysql.createConnection({
         host     : 'localhost',
@@ -96,25 +96,31 @@ app.post("/api/upload", multipartyMiddleware, function (request, response) {
     // console.log(request.files.file[0].path);
     // console.log(request.files.file[0].name);
 
+    console.log(request.files.file.length);
 
-    fs.readFile(`${request.files.file[0].path}`, function (err, data) {
-        var filePath = __dirname + "\\media\\images\\" + request.files.file[0].name;
+    for (var i = 0; i < request.files.file.length; i++) {
+        console.log("Ok_1");
+        writeFile(i);
 
-        fs.writeFile(`${filePath}`, data, function (err) {
-            if (err) {
-                return console.warn(err);
-            }
-            console.log("The file: " + request.files.file[0].name + " was saved to " + filePath);
-        });
-    });
 
-    // var writeableStream = fs.createWriteStream("some.jpg");
-    //
-    // console.log(request.files);
-    // console.log(request.file);
-    //
-    // fs.writeFile("image.jpg", '');
+        function writeFile(i) {
+            console.log("Ok_2");
+            setTimeout(function () {
+                fs.readFile(`${request.files.file[i].path}`, function (err, data) {
+                    console.log("Ok_3");
+                    var filePath = __dirname + "\\media\\images\\" + request.files.file[i].name;
 
+                    fs.writeFile(`${filePath}`, data, function (err) {
+                        console.log("Ok_4");
+                        if (err) {
+                            return console.warn(err);
+                        }
+                        console.log("The file: " + request.files.file[i].name + " was saved to " + filePath);
+                    });
+                });
+            }, 500);
+        }
+    }
 
     response.send(request.body);
 });
