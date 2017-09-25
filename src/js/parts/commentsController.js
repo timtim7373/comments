@@ -1,6 +1,6 @@
 
 var commentsApp = angular.module('commentsApp', ['ngFileUpload']);
-commentsApp.controller("commentsController", function ($scope, Upload, $timeout, $http, $compile) {
+commentsApp.controller("commentsController", function ($scope, Upload, $timeout, $http, $compile, captchaService) {
 
     $scope.comment = {
         name: "tima",
@@ -9,7 +9,8 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
         text: "my test work !!!",
 		date: "",
         parentCommentId: 0,
-        nesting: 0
+        nesting: 0,
+        filesPaths: []
     };
 
     $scope.files = [];
@@ -53,6 +54,7 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
                                     height: newHeight
                                 };
                                 Upload.resize(files[i], options).then(function(resizedFile){
+                                    uploadFile(resizedFile);
                                     $scope.files.push(resizedFile);
                                 });
                             }
@@ -69,40 +71,33 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
                                     height: newHeight
                                 };
                                 Upload.resize(files[i], options).then(function(resizedFile){
+                                    uploadFile(resizedFile);
                                     $scope.files.push(resizedFile);
                                 });
                             }
                         }
                         else if (width < 320 && height < 240) {
-                            console.log("Ok_5");
+                            uploadFile(files[i]);
                             $scope.files.push(files[i]);
                         }
                     }, 500);
                 }
             }
-            else if (files.length > 0 && (files[i].type === "text/plain") && files[i].size < 102400) $scope.files.push(files[i]);
-            else if (files.length > 0 && (files[i].type === "text/plain") && files[i].size > 102400) $scope.warning2 = "The text file must be no more than 100 kbytes";
-            console.log($scope.files);
+            else if (files.length > 0 && (files[i].type === "text/plain") && files[i].size < 102400) {
+                uploadFile(files[i]);
+                $scope.files.push(files[i]);
+            }
+            else if (files.length > 0 && (files[i].type === "text/plain") && files[i].size > 102400) $scope.warning2 = "The text file must be no more than 100 Kbytes";
         }
-    };
-
-    $scope.saveComment = function (comment, commentsForm) {
-
-        if(commentsForm.$valid) {
-            console.log($scope.comment);
-			$scope.comment.date = new Date();
-            $http.post("/", comment).then(function success (response) {
-                console.log(response.data);
-            });
-
-            $scope.warning2 = "";
+        function uploadFile(file) {
             Upload.upload({
                 url: '/api/upload',
-                file: $scope.files
+                file: file
             }).then(function (response) {
                 $timeout(function () {
 
                     console.log(response);
+                    $scope.comment.filesPaths.push(response.data);
 
                 });
             }, function (response) {
@@ -114,6 +109,30 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
                     Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
             });
         }
+    };
+
+    $scope.saveComment = function (comment, commentsForm) {
+
+        $timeout(function () {
+            var captchaSuccess = captchaService.successCaptcha();
+            console.log(captchaSuccess);
+            if (captchaSuccess) {
+                angular.element(document.querySelector('.captcha-error')).css("display", "none");
+                angular.element(document.querySelector('.submit')).css("margin-top", "30px");
+
+                if(commentsForm.$valid) {
+                    console.log($scope.comment);
+                    $scope.comment.date = new Date();
+                    $http.post("/", comment).then(function success (response) {
+                        console.log(response.data);
+                    });
+                }
+            }
+            if (!captchaSuccess) {
+                angular.element(document.querySelector('.captcha-error')).css("display", "block");
+                angular.element(document.querySelector('.submit')).css("margin-top", "4px");
+            }
+        }, 500);
     };
     $scope.dataFromMySQL = [];
 
@@ -151,16 +170,16 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
             var end = $scope.pages.currentPage * 25;
             $scope.dataForView = [];
 
-            // Preparing data for main comments
-            for (i = start; i<end; i++) {
+            // Prepearing data for main comments
+            for (i = start; i < end; i++) {
                 if ($scope.dataFromMySQL[i] === undefined) break;
                 $scope.dataForView.push($scope.dataFromMySQL[i]);
             }
 
             // Rendering of child comments
             $timeout(function () {
-                for (i = 1; i<$scope.childCommentsFromMySQL.length; i++) {
-                    for (j = 0; j<$scope.childCommentsFromMySQL[i].length; j++) {
+                for (i = 1; i < $scope.childCommentsFromMySQL.length; i++) {
+                    for (j = 0; j < $scope.childCommentsFromMySQL[i].length; j++) {
 
                         // Search parent comment
                         parentComment = angular.element(document.querySelector('.c' + $scope.childCommentsFromMySQL[i][j].parent_comment_id));
@@ -190,6 +209,67 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
                     }
                 }
             }, 1000);
+
+            // Rendering of image
+            $timeout(function () {
+                for (var i = 0; i < $scope.dataForView.length; i++) {
+                    if ($scope.dataForView[i].files_paths !== 'undefined' && $scope.dataForView[i].files_paths !== 'null') {
+                        var filesPaths = JSON.parse($scope.dataForView[i].files_paths);
+                        for (var j = 0; j < filesPaths.length; j++) {
+                            // getImage(filesPaths[j], $scope.dataForView[i].id);
+
+                            var element = angular.element(document.querySelector('.c' + $scope.dataForView[i].id));
+                            var img = angular.element('<img>').attr("src", filesPaths[j]);
+                            // compileFn = $compile(img);
+                            // compileFn($scope);
+                            element.append(img);
+                        }
+                    }
+                }
+                for (var k = 1; k < $scope.childCommentsFromMySQL.length; k++) {
+                    for (var l = 0; l < $scope.childCommentsFromMySQL[k].length; l++) {
+                        if ($scope.childCommentsFromMySQL[k][l].files_paths !== 'undefined' && $scope.childCommentsFromMySQL[k][l].files_paths !== 'null') {
+                            var filesPaths2 = JSON.parse($scope.childCommentsFromMySQL[k][l].files_paths);
+                            for (var m = 0; m < filesPaths2.length; m++) {
+                                // getImage(filesPaths[j], $scope.dataForView[i].id);
+
+                                var element2 = angular.element(document.querySelector('.c' + $scope.childCommentsFromMySQL[k][l].id));
+                                var img2 = angular.element('<img>').attr("src", filesPaths2[m]);
+                                // compileFn = $compile(img2);
+                                // compileFn($scope);
+                                element2.append(img2);
+                            }
+                        }
+                    }
+                }
+            }, 1500);
+
+            // Get images and append to comment
+            function getImage(filePath, id) {
+
+                // $http({method:'GET', url:'/file', params: {'filePath': filePath}}).then(function success (response) {
+
+                    // console.log(response);
+                    // // console.log(response.data);
+                    // $scope.image = response.data;
+                    //
+                    // var reader = new FileReader();
+                    // // reader.readAsDataURL(response.data);
+                    // // console.log(reader.result);
+                    // console.log(response.data instanceof String);
+                    // console.log(typeof response.data);
+                    //
+                    // var element = angular.element(document.querySelector('.c' + id));
+                    // var img = angular.element('<img>');
+                    // // .attr('src', response.data);
+                    //
+                    //
+                    // // img.append(response.data);
+                    // compileFn = $compile(img);
+                    // compileFn($scope);
+                    // element.append(img);
+                // });
+            }
         }
     };
 
@@ -287,7 +367,7 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
     };
 
     // Getting data from Database
-    var getDataFromMySQL = function () {
+    function getDataFromMySQL () {
         $http.get("/comments").then(function success (response) {
 			var date, nesting;
             var options = {
@@ -318,6 +398,7 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
             console.log($scope.dataFromMySQL);
             console.log($scope.childCommentsFromMySQL);
 		});
-	};
+	}
     getDataFromMySQL();
+    captchaService.initializCaptha();
 });

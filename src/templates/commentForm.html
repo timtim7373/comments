@@ -13,5 +13,6 @@
     </div>
     <!--<div id="captcha" class="row"></div>-->
     <div ng-transclude></div>
-    <input type="submit" value="Send" ng-click="saveComment(comment, commentsForm)" />
+    <p class="captcha-error">invalid captcha code</p>
+    <input class="submit" type="submit" value="Send" ng-click="saveComment(comment, commentsForm)" />
 </form>

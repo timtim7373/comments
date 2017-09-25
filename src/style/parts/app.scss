@@ -23,6 +23,14 @@
     color: #ff0a00;
     font-size: 11px;
   }
+  .captcha-error {
+    color: #ff0a00;
+    font-size: 11px;
+    padding-left: 100px;
+    margin-bottom: 0;
+    display: none;
+    height: 26px;
+  }
   .preview-container {
     padding-left: 70px;
     .preview {
@@ -113,5 +121,18 @@
   .nesting10 {
     color: #0012fb;
     padding-left: 300px;
+  }
+  .pages-buttons {
+    display: inline-block;
+  }
+  .pages-buttons a {
+    text-decoration: none;
+    color: #2980b9;
+    background: #f5f6f8;
+    position: relative;
+    margin: 3px;
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 18px;
   }
 }

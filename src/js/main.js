@@ -6,4 +6,6 @@
 //= parts/commentsController.js
 //= parts/commentForm.js
 //= parts/commentsList.js
-//= parts/captcha.js
+
+// parts/captcha.js
+//= parts/captchaService.js

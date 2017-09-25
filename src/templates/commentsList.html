@@ -23,8 +23,9 @@
             </tbody>
         </table>
     </div>
+    <label for="">Pages:
     <div class="pages-buttons">
         <a href="#" ng-repeat="page in pages.pages" ng-click="pages.currentPage = page; pages.pageCreator()">{{ page }}</a>
-    </div>
+    </div></label>
     <p>{{ pages.currentPage }}</p>
 </div>
