@@ -14,7 +14,7 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
     };
 
     $scope.files = [];
-
+    $scope.htmlTagsControll = "";
     // Upload files
     $scope.uploadFiles = function (files) {
 
@@ -111,11 +111,99 @@ commentsApp.controller("commentsController", function ($scope, Upload, $timeout,
         }
     };
 
+    
+    $scope.tagControll = function () {
+
+        console.log("Ok");
+        var tags = $scope.comment.text.match(/\/?<[^>]+>/igm);
+        // console.log(tags);
+        var isAllowableTags, tagA, tagCode, tagI, tagStrong, partOfString;
+        if (tags !== null) {
+            for (var i = 0; i < tags.length; i++) {
+                tagA = tags[i].match(/<\/?a\s*(href=(["'])[^"']*\2)?\s*(title=(["'])[^"']*\4)?>/i);
+                tagCode = tags[i].match(/<\/?code>/i);
+                tagI = tags[i].match(/<\/?i>/i);
+                tagStrong = tags[i].match(/<\/?strong>/i);
+                if ((tagA||tagCode||tagI||tagStrong) !== null) isAllowableTags = true;
+                else {
+                    // angular.element(document.querySelector('.tags-warning')).text("Unallowable tag").css("color", "red");
+                    isAllowableTags = false;
+                    break;
+                }
+            }
+        }
+
+        var aOpening = /<a\s*(href=(["'])[^"']*\2)?\s*(title=(["'])[^"']*\4)?>/igm;
+        var aClosing = /<\/a>/ig;
+        var codeOpening = /<code>/igm;
+        var codeClosing = /<\/code>/igm;
+        var iOpening = /<i>/igm;
+        var iClosing = /<\/i>/igm;
+        var strongOpening = /<strong>/igm;
+        var strongClosing = /<\/strong>/igm;
+        var result;
+        // var tagsClosing;
+        var count = 0;
+
+        // console.log($scope.comment.text);
+        // console.log(aOpening.exec($scope.comment.text));
+        // console.log($scope.comment.text);
+        if (aOpening.exec($scope.comment.text) !== null) isTagClosed(aOpening, aClosing);
+        if (codeOpening.exec($scope.comment.text) !== null) isTagClosed(codeOpening, codeClosing);
+        if (iOpening.exec($scope.comment.text) !== null) isTagClosed(iOpening, iClosing);
+        if (strongOpening.exec($scope.comment.text) !== null) isTagClosed(strongOpening, strongClosing);
+
+        function isTagClosed(openingTag, closingTag) {
+            console.log("Ok_1");
+            openingTag.lastIndex = 0;
+            // console.log("a", aOpening.lastIndex);
+            // console.log("внутренняя", openingTag.lastIndex);
+            // console.log(closingTag);
+            // console.log(openingTag.exec($scope.comment.text));
+            // openingTag.exec($scope.comment.text);
+            // var result;
+            while (result = openingTag.exec($scope.comment.text)) {
+                console.log("Ok_2");
+                if (openingTag.lastIndex > closingTag.lastIndex) closingTag.lastIndex = openingTag.lastIndex;
+                var tagsClosing = closingTag.exec($scope.comment.text);
+                console.log(tagsClosing);
+                if (tagsClosing === null) {
+                    console.log("Ok_3");
+                    angular.element(document.querySelector('.tags-warning')).text("Closing tags it is not enough").css("color", "red").css("border", "red");
+                    count++;
+                }
+            }
+        }
+        console.log(count);
+        if (count === 0) {
+            var ads = angular.element(document.querySelector('.tags-warning')).css("color", "black");
+            document.querySelector('.tags-warning').innerHTML ="Attention! Acceptable HTML tags: <b>a</b>, <b>i</b>, <b>code</b> ang <b>strong</b>";
+        }
+
+
+        // if (tags !== null) {
+        //     for (var j = 0; j < tags.length; j++) {
+        //         tagA = tags[j].match(/<a\s*(href=(["'])[^"']*\2)?\s*(title=(["'])[^"']*\4)?>/i);
+        //         tagCode = tags[j].match(/<code>/i);
+        //         tagI = tags[j].match(/<i>/i);
+        //         tagStrong = tags[j].match(/<strong>/i);
+        //         // console.log(tagA);
+        //         if (tagA !== null) {
+        //             partOfString = $scope.comment.text.replace(/<a>/im, "$'");
+        //             // console.log(partOfString);
+        //             // console.log("1");
+        //             var adc= (/<a>/im);
+        //
+        //         }
+        //     }
+        // }
+        // return isAllowableTags;
+    };
     $scope.saveComment = function (comment, commentsForm) {
 
         $timeout(function () {
             var captchaSuccess = captchaService.successCaptcha();
-            console.log(captchaSuccess);
+
             if (captchaSuccess) {
                 angular.element(document.querySelector('.captcha-error')).css("display", "none");
                 angular.element(document.querySelector('.submit')).css("margin-top", "30px");

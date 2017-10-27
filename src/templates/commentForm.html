@@ -2,8 +2,9 @@
     <label>Name<input type="text" placeholder="Name" ng-model="comment.name" pattern="[^А-Яа-яЁё]+" required /></label>
     <label>E-mail<input type="email" placeholder="Your email" ng-model="comment.email" required /></label>
     <label>Homepage<input type="text" ng-model="comment.url" placeholder="Url"></label>
-    <textarea name="" id="" cols="50" rows="10" ng-model="comment.text" pattern="[^<>]+" required placeholder="Text"></textarea>
-    <p>* Attention! HTML tags are not allowed in comments</p>
+    <textarea name="" id="" cols="50" rows="10" ng-model="comment.text" ng-blur="tagControll()" required placeholder="Text"></textarea>
+    <!--pattern="[^<>]+"-->
+    <p class="tags-warning">Attention! Acceptable HTML tags: <b>a</b>, <b>i</b>, <b>code</b> ang <b>strong</b></p>
     <button ngf-select="uploadFiles($files)" multiple
             accept="image/jpeg, image/png, image/gif, text/plain">Select Files</button>
     <p class="warning2" ng-bind="warning2"></p>
