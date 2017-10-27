@@ -34,7 +34,8 @@ fieldset {
     height:147px;
     margin-left: 80px;
     /*margin-bottom: 10px;*/
-    background:url(http://mkstudio.at.ua/demos/captcha/images/default-main.png) no-repeat;
+    background: url(../../img/default-main.png) no-repeat;
+    /*background:url(http://mkstudio.at.ua/demos/captcha/images/default-main.png) no-repeat;*/
 }
 .captcha-holder .captcha-block {
     width:100%;
